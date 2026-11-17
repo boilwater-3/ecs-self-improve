@@ -40,7 +40,7 @@
             "name": "llvm-ninja-debug",
             "inherits": "macos-base",
             "displayName": "macOS Ninja Debug",
-            "description": "Daily macOS debugging preset via Conan",
+            "description": "macOS Debug preset via Conan",
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/${presetName}/build/Debug/generators/conan_toolchain.cmake",
                 "CMAKE_BUILD_TYPE": "Debug",
@@ -65,44 +65,23 @@
             }
         },
         {
-            "name": "windows-base",
-            "hidden": true,
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            },
-            "toolset": "host=x64",
-            "architecture": "x64",
+            "name": "llvm-ninja-asan",
+            "inherits": "macos-base",
+            "displayName": "macOS Ninja Debug + ASan/UBSan",
+            "description": "macOS Debug preset with ASan and UBSan enabled via Conan",
             "cacheVariables": {
-                "PACKAGE_MANAGER": "conan",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/${presetName}/build/generators/conan_toolchain.cmake",
-                "ENABLE_PCH": "ON"
-            }
-        },
-        {
-            "name": "VisualStudio.15.0-amd64",
-            "displayName": "VS2026 + v141 (x64, Conan)",
-            "description": "VS2026 generator with v141 toolset via Conan.",
-            "inherits": "windows-base",
-            "generator": "Visual Studio 18 2026",
-            "toolset": "v141",
-            "cacheVariables": {
-                "CMAKE_CXX_STANDARD": "17",
-                "BUILD_SHARED_LIBS": "OFF",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/${presetName}/build/Debug/generators/conan_toolchain.cmake",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ENABLE_ASAN": "ON",
+                "ENABLE_UBSAN": "ON",
                 "ENABLE_TESTING": "ON",
                 "ENABLE_EXAMPLES": "ON",
-                "ENABLE_INSTALL": "ON"
+                "ENABLE_INSTALL": "OFF",
+                "BUILD_SHARED_LIBS": "OFF"
             }
         }
     ],
     "buildPresets": [
-        {
-            "name": "windows-build-base",
-            "hidden": true,
-            "jobs": 4
-        },
         {
             "name": "llvm-ninja-debug",
             "configurePreset": "llvm-ninja-debug"
@@ -112,18 +91,8 @@
             "configurePreset": "llvm-ninja-release"
         },
         {
-            "name": "VisualStudio.15.0-amd64-debug",
-            "displayName": "VS2026 v141 - Debug",
-            "inherits": "windows-build-base",
-            "configurePreset": "VisualStudio.15.0-amd64",
-            "configuration": "Debug"
-        },
-        {
-            "name": "VisualStudio.15.0-amd64-release",
-            "displayName": "VS2026 v141 - Release",
-            "inherits": "windows-build-base",
-            "configurePreset": "VisualStudio.15.0-amd64",
-            "configuration": "Release"
+            "name": "llvm-ninja-asan",
+            "configurePreset": "llvm-ninja-asan"
         }
     ],
     "testPresets": [
@@ -148,16 +117,9 @@
             "configurePreset": "llvm-ninja-release"
         },
         {
-            "name": "VisualStudio.15.0-amd64-debug",
+            "name": "llvm-ninja-asan",
             "inherits": "test-base",
-            "configurePreset": "VisualStudio.15.0-amd64",
-            "configuration": "Debug"
-        },
-        {
-            "name": "VisualStudio.15.0-amd64-release",
-            "inherits": "test-base",
-            "configurePreset": "VisualStudio.15.0-amd64",
-            "configuration": "Release"
+            "configurePreset": "llvm-ninja-asan"
         }
     ]
 }

@@ -25,8 +25,8 @@ ECS 构建/测试工具
   scripts/ecs.sh install <configure_preset> [--prefix DIR]   # 打包安装（不构建）
   scripts/ecs.sh doctor
 
-configure_preset 例：llvm-ninja-release-local | llvm-ninja-debug-local | VisualStudio.15.0-amd64
-build/test preset 例：llvm-ninja-release-local | llvm-ninja-debug-local | VisualStudio.15.0-amd64-release
+configure_preset 例：llvm-ninja-release | llvm-ninja-debug | llvm-ninja-asan | llvm-ninja-release-local
+build/test preset 例：llvm-ninja-release | llvm-ninja-debug | llvm-ninja-asan | llvm-ninja-release-local
 
 build 禁止隐式 reconfigure：CMake/依赖变更后须先 configure 对应 preset，再 build。
 EOF

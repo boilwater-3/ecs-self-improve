@@ -51,18 +51,10 @@ BINARY_DIR="$(_query binaryDir)"
 BUILD_TYPE="$(_query buildType)"
 ENABLE_TESTING="$(_query enableTesting)"
 CPPSTD="$(_query cppstd)"
-GENERATOR="$(_query generator)"
 
 # --- 组装 conan install 公共参数 ---------------------------------------------
-IS_MULTI_CONFIG_VS=0
-if [[ "${GENERATOR}" == Visual\ Studio* ]]; then
-    IS_MULTI_CONFIG_VS=1
-    CONAN_BUILD_TYPES=("Debug" "Release")
-else
-    if [[ -z "${BUILD_TYPE}" ]]; then
-        BUILD_TYPE="Release"
-    fi
-    CONAN_BUILD_TYPES=("${BUILD_TYPE}")
+if [[ -z "${BUILD_TYPE}" ]]; then
+    BUILD_TYPE="Release"
 fi
 
 CONAN_COMMON_ARGS=(
@@ -73,45 +65,22 @@ CONAN_COMMON_ARGS=(
     -o "&:enable_testing=${ENABLE_TESTING}"
 )
 
-if [[ "${IS_MULTI_CONFIG_VS}" -eq 1 ]]; then
-    CONAN_COMMON_ARGS+=(
-        -c "tools.cmake.cmaketoolchain:generator=${GENERATOR}"
-        -s "os=Windows"
-        -s "arch=x86_64"
-        -s "compiler=msvc"
-        -s "compiler.runtime=dynamic"
-    )
-    if [[ "${GENERATOR}" == "Visual Studio 18 2026" ]]; then
-        CONAN_COMMON_ARGS+=(
-            -c "tools.microsoft.msbuild:vs_version=18"
-            -s "compiler.version=191"
-        )
-    fi
-fi
-
-# --- 执行（按配置列表循环）---------------------------------------------------
+# --- 执行 -------------------------------------------------------------------
 echo "[bootstrap_conan] preset=${CONFIGURE_PRESET}"
 echo "[bootstrap_conan] output-folder=${BINARY_DIR}"
-echo "[bootstrap_conan] build_type=${BUILD_TYPE:-multi-config(Debug+Release)}"
+echo "[bootstrap_conan] build_type=${BUILD_TYPE}"
 echo "[bootstrap_conan] cppstd=${CPPSTD}"
 echo "[bootstrap_conan] enable_testing=${ENABLE_TESTING}"
 echo
 
-for _build_type in "${CONAN_BUILD_TYPES[@]}"; do
-    echo "[bootstrap_conan] --- build_type=${_build_type} ---"
-    echo "[bootstrap_conan] 运行: conan ${CONAN_COMMON_ARGS[*]} -s build_type=${_build_type}"
-    echo
-    conan "${CONAN_COMMON_ARGS[@]}" -s "build_type=${_build_type}"
-done
+echo "[bootstrap_conan] 运行: conan ${CONAN_COMMON_ARGS[*]} -s build_type=${BUILD_TYPE}"
+echo
+conan "${CONAN_COMMON_ARGS[@]}" -s "build_type=${BUILD_TYPE}"
 
 # --- 报告生成的 toolchain 路径 ----------------------------------------------
 TOOLCHAIN="$(_query toolchain)"
 if [[ -z "${TOOLCHAIN}" ]]; then
-    if [[ "${IS_MULTI_CONFIG_VS}" -eq 1 ]]; then
-        TOOLCHAIN="${BINARY_DIR}/build/generators/conan_toolchain.cmake"
-    else
-        TOOLCHAIN="${BINARY_DIR}/build/${BUILD_TYPE}/generators/conan_toolchain.cmake"
-    fi
+    TOOLCHAIN="${BINARY_DIR}/build/${BUILD_TYPE}/generators/conan_toolchain.cmake"
 fi
 
 echo
